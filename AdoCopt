@@ -5,8 +5,8 @@ import java.nio.file.StandardCopyOption;
 
 public class CopyFiles {
 
-    private static final String SOURCE_FOLDER = "/path/to/source/folder";
-    private static final String DESTINATION_FOLDER = "/path/to/destination/folder";
+    private static final String SOURCE_FOLDER = "\\source";
+    private static final String DESTINATION_FOLDER = "\\TestSource";
 
     public static void main(String[] args) throws IOException {
         File sourceFolder = new File(SOURCE_FOLDER);
@@ -36,8 +36,13 @@ public class CopyFiles {
                     File destinationFolderResources = new File(destinationFolderMain, "resources");
                     destinationFolderResources.mkdirs();
 
-                    copyContents(ejbModuleFolder, destinationFolderJava);
-                    copyContents(new File(ejbModuleFolder, "META-INF"), destinationFolderResources);
+                    File scbFolder = new File(ejbModuleFolder, "scb");
+                    copyContents(scbFolder,new File(destinationFolderJava,"scb"));
+
+                    File metaInfFolder = new File(ejbModuleFolder, "META-INF");
+                    if (metaInfFolder.exists() && metaInfFolder.isDirectory()) {
+                        copyContents(metaInfFolder, destinationFolderResources);
+                    }
                 }
             }
         }
