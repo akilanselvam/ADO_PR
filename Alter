@@ -22,25 +22,22 @@ public class CopyFiles {
                 File destinationFolderEBBS = new File(destinationFolder, file.getName());
                 destinationFolderEBBS.mkdirs();
 
-                File[] ejbModuleFiles = file.listFiles();
-                for (File ejbModuleFile : ejbModuleFiles) {
-                    if (ejbModuleFile.isDirectory() && ejbModuleFile.getName().equals("ejbModule")) {
-                        File destinationFolderSrc = new File(destinationFolderEBBS, "src");
-                        destinationFolderSrc.mkdirs();
+                File destinationFolderSrc = new File(destinationFolderEBBS, "src");
+                destinationFolderSrc.mkdirs();
 
-                        File destinationFolderMain = new File(destinationFolderSrc, "main");
-                        destinationFolderMain.mkdirs();
+                File destinationFolderMain = new File(destinationFolderSrc, "main");
+                destinationFolderMain.mkdirs();
 
-                        File destinationFolderJava = new File(destinationFolderMain, "java");
-                        destinationFolderJava.mkdirs();
+                File destinationFolderJava = new File(destinationFolderMain, "java");
+                destinationFolderJava.mkdirs();
 
-                        File[] javaFiles = ejbModuleFile.listFiles();
-                        for (File javaFile : javaFiles) {
-                            if (javaFile.isFile() && javaFile.getName().endsWith(".java")) {
-                                File destinationFile = new File(destinationFolderJava, javaFile.getName());
-                                destinationFile.getParentFile().mkdirs();
-                                Files.copy(javaFile.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                            }
+                File ejbModuleFolder = new File(file, "ejbModule");
+                if (ejbModuleFolder.exists() && ejbModuleFolder.isDirectory()) {
+                    File[] javaFiles = ejbModuleFolder.listFiles();
+                    for (File javaFile : javaFiles) {
+                        if (javaFile.isFile() && javaFile.getName().endsWith(".java")) {
+                            File destinationFile = new File(destinationFolderJava, javaFile.getName());
+                            Files.copy(javaFile.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                         }
                     }
                 }
