@@ -1,0 +1,115 @@
+import jxl.Workbook;
+import jxl.write.Label;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class JavaFilesMappingToExcelJExcelApi {
+    public static void main(String[] args) {
+        Map<String, String> pathToRepoMap = new HashMap<>();
+        List<String> repoFileNames = new ArrayList<>();
+        Map<String, String> repoToPathMap = new HashMap<>();
+
+        readRepoFileAndPopulateMaps(pathToRepoMap, repoFileNames, repoToPathMap, "C:\\Users\\selva\\Downloads\\Sample_Files\\repo1.txt");
+        readRepoFileAndPopulateMaps(pathToRepoMap, repoFileNames, repoToPathMap, "C:\\Users\\selva\\Downloads\\Sample_Files\\repo2.txt");
+        // Add more repo files as needed
+
+        try {
+            WritableWorkbook workbook = Workbook.createWorkbook(new File("C:\\Users\\selva\\Downloads\\Sample_Files\\java_files_mapping.xls"));
+            WritableSheet sheet = workbook.createSheet("File Mapping", 0);
+
+            Label headerLabel0 = new Label(0, 0, "Large Repo Path");
+            Label headerLabel1 = new Label(1, 0, "File Name");
+            Label headerLabel2 = new Label(2, 0, "Moved To Repo");
+            Label headerLabel3 = new Label(3, 0, "Repo Path");
+            sheet.addCell(headerLabel0);
+            sheet.addCell(headerLabel1);
+            sheet.addCell(headerLabel2);
+            sheet.addCell(headerLabel3);
+
+            BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\selva\\Downloads\\Sample_Files\\MainRepo.txt"));
+            String line;
+            int rowIndex = 1;
+
+            while ((line = reader.readLine()) != null) {
+                String fullPath = line.trim().replace("\\", "/");
+                String[] parts = fullPath.split("/");
+                if (parts.length > 0) {
+                    String fileName = parts[parts.length - 1];
+                    String parentFolder = parts[parts.length - 2];
+                    String key = parentFolder + "/" + fileName;
+
+                    String matchedRepo = null;
+                    for (String repoFileName : repoFileNames) {
+                        if (pathToRepoMap.containsKey(key)) {
+                            matchedRepo = pathToRepoMap.get(key);
+                            break;
+                        }
+                    }
+                    String packageStructure = key;
+                    String repoPath = repoToPathMap.getOrDefault(matchedRepo, "");
+
+                    Label label0 = new Label(0, rowIndex, fullPath);
+                    Label label1 = new Label(1, rowIndex, fileName);
+                    Label label2 = new Label(2, rowIndex, matchedRepo);
+                    Label label3 = new Label(3, rowIndex, packageStructure);
+                    sheet.addCell(label0);
+                    sheet.addCell(label1);
+                    sheet.addCell(label2);
+                    sheet.addCell(label3);
+
+                    rowIndex++;
+                }
+            }
+
+            workbook.write();
+            workbook.close();
+            reader.close();
+
+            System.out.println("Excel file created successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void readRepoFileAndPopulateMaps(
+            Map<String, String> pathToRepoMap,
+            List<String> repoFileNames,
+            Map<String, String> repoToPathMap,
+            String repoFileName) {
+        try {
+            String repo = repoFileName.substring(repoFileName.lastIndexOf("\\") + 1, repoFileName.lastIndexOf(".txt"));
+
+            BufferedReader reader = new BufferedReader(new FileReader(repoFileName));
+            String repoPath = reader.readLine().trim().replace("\\", "/");
+            repoToPathMap.put(repo, repoPath);
+            reader.close();
+
+            repoFileNames.add(repo);
+
+            reader = new BufferedReader(new FileReader(repoFileName));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String fullPath = line.trim().replace("\\", "/");
+                String[] parts = fullPath.split("/");
+                if (parts.length > 0) {
+                    String fileName = parts[parts.length - 1];
+                    String parentFolder = parts[parts.length - 2];
+                    String key = parentFolder + "/" + fileName;
+                    pathToRepoMap.put(key, repo);
+                }
+            }
+            reader.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
