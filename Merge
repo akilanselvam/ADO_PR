@@ -1,0 +1,52 @@
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+
+public class MergeFolders {
+    public static void main(String[] args) {
+        String sourcePath = "path_to_source_directory"; // Replace with your source directory path
+        String destinationPath = "path_to_destination_directory"; // Replace with your destination directory path
+
+        File sourceDirectory = new File(sourcePath);
+        File destinationDirectory = new File(destinationPath);
+
+        if (!sourceDirectory.exists() || !sourceDirectory.isDirectory()) {
+            System.out.println("Source directory does not exist or is not a directory.");
+            return;
+        }
+
+        if (!destinationDirectory.exists() || !destinationDirectory.isDirectory()) {
+            System.out.println("Destination directory does not exist or is not a directory.");
+            return;
+        }
+
+        File[] sourceFolders = sourceDirectory.listFiles();
+
+        if (sourceFolders != null) {
+            for (File folder : sourceFolders) {
+                if (folder.isDirectory()) {
+                    mergeFolderContents(folder, destinationDirectory);
+                }
+            }
+        }
+
+        System.out.println("Merged all folders into " + destinationPath);
+    }
+
+    private static void mergeFolderContents(File sourceFolder, File destinationFolder) {
+        File[] files = sourceFolder.listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                File destinationFile = new File(destinationFolder, file.getName());
+
+                try {
+                    Files.copy(file.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
