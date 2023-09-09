@@ -1,0 +1,10 @@
+@echo off
+set sourceFile=source_paths.txt
+set destinationPath=C:\destination\
+
+for /f "delims=" %%a in (%sourceFile%) do (
+    echo Copying "%%a" to "%destinationPath%"
+    copy "%%a" "%destinationPath%"
+)
+
+echo Copy operation completed.
